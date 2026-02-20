@@ -11,7 +11,7 @@ const CONFIG = {
     // Obtener en: https://portal.azure.com
     azure: {
         clientId: '0681dda0-70f4-4038-b901-d41ee738cc2e',  // ← App Registration → Overview
-        tenantId: '3af6b5a8-d84b-4cfa-9942-c6af8638c3e8',  // ← App Registration → Overview
+        tenantId: '3c907651-d8c6-4ca6-a8a4-6a242430e653',  // ← App Registration → Overview
         
         // ⚠️ NO MODIFICAR estos permisos
         scopes: [
