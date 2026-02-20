@@ -2,6 +2,7 @@
  * ═══════════════════════════════════════════════════════════════
  * CITRO — Autenticación Microsoft (OPTIMIZADO)
  * Azure Active Directory con MSAL 2.x
+ * Validación de dominio @uv.mx
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -49,8 +50,9 @@ function initMSAL() {
         .catch(error => {
             console.error('Error MSAL:', error);
             if (CONFIG.options.debug) {
-                alert('Error al inicializar autenticación: ' + error.message);
+                console.log('Error details:', error);
             }
+            showLoginUI();
         });
 }
 
@@ -98,7 +100,10 @@ async function signInWithMicrosoft() {
             console.log('Login cancelado por el usuario');
         } else {
             console.error('Error en login:', error);
-            alert('Error al iniciar sesión. Por favor, inténtelo nuevamente.\n\n' + error.message);
+            
+            // Mostrar mensaje de error amigable
+            const errorMsg = getErrorMessage(error);
+            showErrorBanner(errorMsg);
         }
     }
 }
@@ -149,11 +154,17 @@ async function loadProfile(account) {
             initials: getInitials(userData.displayName)
         };
 
-        // Verificar dominio institucional si está configurado
+        // ════════════════════════════════════════════════════════
+        // VALIDACIÓN DE DOMINIO @uv.mx
+        // ════════════════════════════════════════════════════════
         if (CONFIG.options.soloEmailUV) {
             const emailDomain = userState.profile.email.split('@')[1];
+            
             if (emailDomain !== CONFIG.options.dominioPermitido) {
-                alert(`⚠️ Solo se permite acceso con cuentas @${CONFIG.options.dominioPermitido}\n\nTu cuenta: ${userState.profile.email}`);
+                // Mostrar mensaje de error visual
+                showDomainErrorBanner(userState.profile.email, CONFIG.options.dominioPermitido);
+                
+                // Cerrar sesión
                 await signOutMicrosoft();
                 return;
             }
@@ -377,6 +388,119 @@ function isAdmin() {
     return userState.isAdmin;
 }
 
+// ════════════════════════════════════════════════════════════════
+// FUNCIONES DE MENSAJES DE ERROR
+// ════════════════════════════════════════════════════════════════
+
+/**
+ * Mostrar mensaje de error de dominio
+ */
+function showDomainErrorBanner(userEmail, requiredDomain) {
+    const banner = document.getElementById('login-required-banner');
+    
+    banner.innerHTML = `
+        <div style="background:#FDE7D9;border:2px solid #D83B01;padding:24px;border-radius:8px;text-align:center;max-width:600px;margin:20px auto;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
+            <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+            
+            <h3 style="color:#D83B01;margin:0 0 16px;font-size:20px;font-weight:600">
+                Acceso Restringido
+            </h3>
+            
+            <p style="color:#333;margin:0 0 16px;line-height:1.6;font-size:15px">
+                Este sistema está disponible únicamente para personal de la<br>
+                <strong>Universidad Veracruzana</strong>
+            </p>
+            
+            <div style="background:#fff;border:1px solid #D83B01;border-radius:6px;padding:16px;margin:20px 0">
+                <div style="margin-bottom:12px">
+                    <strong style="color:#666;font-size:13px;display:block;margin-bottom:4px">Tu cuenta:</strong>
+                    <span style="color:#D83B01;font-weight:600;font-size:15px;font-family:monospace">${userEmail}</span>
+                </div>
+                <div>
+                    <strong style="color:#666;font-size:13px;display:block;margin-bottom:4px">Dominio requerido:</strong>
+                    <span style="color:#107C10;font-weight:600;font-size:15px;font-family:monospace">@${requiredDomain}</span>
+                </div>
+            </div>
+            
+            <p style="color:#666;font-size:14px;margin:0 0 16px;line-height:1.5">
+                Si eres parte de la Universidad Veracruzana, cierra esta sesión<br>
+                y accede con tu cuenta institucional <strong>@${requiredDomain}</strong>
+            </p>
+            
+            <button onclick="location.reload()" style="background:#0078D4;color:#fff;border:none;padding:10px 24px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px">
+                Intentar de nuevo
+            </button>
+        </div>
+    `;
+    
+    banner.style.display = 'flex';
+    
+    // Log para debugging
+    if (CONFIG.options.debug) {
+        console.warn('❌ Acceso denegado - Dominio no autorizado');
+        console.log('Email del usuario:', userEmail);
+        console.log('Dominio requerido:', requiredDomain);
+    }
+}
+
+/**
+ * Mostrar mensaje de error general
+ */
+function showErrorBanner(errorMessage) {
+    const banner = document.getElementById('login-required-banner');
+    
+    banner.innerHTML = `
+        <div style="background:#FFF4CE;border:2px solid #D83B01;padding:24px;border-radius:8px;text-align:center;max-width:600px;margin:20px auto">
+            <div style="font-size:48px;margin-bottom:16px">⚠️</div>
+            
+            <h3 style="color:#D83B01;margin:0 0 16px;font-size:20px">
+                Error al iniciar sesión
+            </h3>
+            
+            <p style="color:#333;margin:0 0 16px;line-height:1.6">
+                ${errorMessage}
+            </p>
+            
+            <button onclick="location.reload()" style="background:#0078D4;color:#fff;border:none;padding:10px 24px;border-radius:4px;font-size:14px;font-weight:600;cursor:pointer">
+                Intentar nuevamente
+            </button>
+        </div>
+    `;
+    
+    banner.style.display = 'flex';
+}
+
+/**
+ * Obtener mensaje de error amigable
+ */
+function getErrorMessage(error) {
+    // Errores comunes de MSAL
+    const errorMessages = {
+        'endpoints_resolution_error': 'No se pudo conectar con Microsoft. Verifica tu conexión a internet e intenta nuevamente.',
+        'interaction_in_progress': 'Ya hay una sesión en proceso. Por favor, espera un momento.',
+        'user_cancelled': 'Login cancelado.',
+        'consent_required': 'Se requieren permisos adicionales. Contacta al administrador.',
+        'login_required': 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+        'token_renewal_error': 'Error al renovar la sesión. Por favor, inicia sesión nuevamente.',
+        'invalid_grant': 'Credenciales inválidas. Verifica tu cuenta e intenta nuevamente.',
+        'server_error': 'Error del servidor de Microsoft. Intenta nuevamente en unos minutos.',
+        'temporarily_unavailable': 'El servicio no está disponible temporalmente. Intenta más tarde.'
+    };
+
+    // Buscar mensaje específico
+    const errorCode = error.errorCode || error.error;
+    if (errorCode && errorMessages[errorCode]) {
+        return errorMessages[errorCode];
+    }
+
+    // Mensaje genérico
+    return 'Ocurrió un error al iniciar sesión. Por favor, inténtelo nuevamente.';
+}
+
+// ════════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════════
+
 // Inicializar cuando carga el DOM
 document.addEventListener('DOMContentLoaded', initMSAL);
 
@@ -384,4 +508,5 @@ document.addEventListener('DOMContentLoaded', initMSAL);
 if (CONFIG.options.debug) {
     console.log(`🚀 ${CONFIG.version.nombre} v${CONFIG.version.numero}`);
     console.log(`📅 ${CONFIG.version.fecha}`);
+    console.log(`🔐 Validación de dominio: ${CONFIG.options.soloEmailUV ? 'Activa (@' + CONFIG.options.dominioPermitido + ')' : 'Desactivada'}`);
 }
