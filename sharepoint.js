@@ -1,8 +1,9 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- * CITRO — Integración SharePoint (OPTIMIZADO)
+ * CITRO — Integración SharePoint (ACTUALIZADO)
  * Microsoft Graph API + SharePoint REST API
  * Site: https://uvmx.sharepoint.com/sites/CtTramites2026
+ * Versión: 1.1 - Actualizada y Optimizada
  * ═══════════════════════════════════════════════════════════════
  */
 
@@ -114,6 +115,15 @@ async function createSolicitudEnSharePoint(solicitudData) {
         const siteId = await getSiteId();
         const formData = solicitudData.formData;
 
+        // Validar datos requeridos
+        if (!solicitudData.folio) {
+            throw new Error('Falta el folio de la solicitud');
+        }
+
+        if (!solicitudData.tipo) {
+            throw new Error('Falta el tipo de trámite');
+        }
+
         // Preparar campos para SharePoint
         const fields = {
             Title: solicitudData.folio,
@@ -136,6 +146,14 @@ async function createSolicitudEnSharePoint(solicitudData) {
             NotasCT: '',
             URLPdf: ''
         };
+
+        if (CONFIG.options.debug) {
+            console.log('📤 Enviando solicitud a SharePoint:', {
+                folio: fields.Folio,
+                tipo: fields.TipoTramite,
+                nombre: fields.NombreSolicitante
+            });
+        }
 
         const response = await callGraph(
             `/sites/${siteId}/lists/${CONFIG.sharepoint.listName}/items`,
@@ -164,9 +182,26 @@ async function uploadPDFToSharePoint(pdfBlob, folio, tipoTramite) {
     try {
         const siteId = await getSiteId();
         
+        // Validar parámetros
+        if (!pdfBlob || pdfBlob.size === 0) {
+            throw new Error('El archivo PDF está vacío');
+        }
+
+        if (!folio) {
+            throw new Error('Falta el folio para nombrar el PDF');
+        }
+
         // Obtener carpeta según tipo de trámite
         const carpeta = CONFIG.sharepoint.folders[tipoTramite] || '06_Otros';
         const fileName = `${folio}.pdf`;
+
+        if (CONFIG.options.debug) {
+            console.log('📤 Subiendo PDF a SharePoint:', {
+                carpeta,
+                archivo: fileName,
+                tamaño: `${(pdfBlob.size / 1024).toFixed(2)} KB`
+            });
+        }
 
         // Convertir blob a array buffer
         const arrayBuffer = await pdfBlob.arrayBuffer();
@@ -185,7 +220,8 @@ async function uploadPDFToSharePoint(pdfBlob, folio, tipoTramite) {
         });
 
         if (!response.ok) {
-            throw new Error(`Error al subir PDF: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`Error al subir PDF (${response.status}): ${errorText}`);
         }
 
         const data = await response.json();
@@ -205,6 +241,34 @@ async function uploadPDFToSharePoint(pdfBlob, folio, tipoTramite) {
 
 /**
  * ═══════════════════════════════════════════════════════════════
+ * ACTUALIZAR URL DEL PDF EN SOLICITUD
+ * ═══════════════════════════════════════════════════════════════
+ */
+async function updatePdfUrlInSolicitud(itemId, pdfUrl) {
+    try {
+        const siteId = await getSiteId();
+
+        await callGraph(
+            `/sites/${siteId}/lists/${CONFIG.sharepoint.listName}/items/${itemId}/fields`,
+            'PATCH',
+            {
+                URLPdf: pdfUrl
+            }
+        );
+
+        if (CONFIG.options.debug) {
+            console.log('✅ URL del PDF actualizada en solicitud:', itemId);
+        }
+
+    } catch (error) {
+        console.error('Error al actualizar URL del PDF:', error);
+        // No lanzar error para no bloquear el flujo
+        console.warn('⚠️ La URL del PDF no se pudo actualizar en SharePoint');
+    }
+}
+
+/**
+ * ═══════════════════════════════════════════════════════════════
  * ACTUALIZAR SOLICITUD (Solo Admin)
  * ═══════════════════════════════════════════════════════════════
  */
@@ -212,6 +276,10 @@ async function updateSolicitudEnSharePoint(itemId, updates) {
     try {
         if (!userState.isAdmin) {
             throw new Error('No tienes permisos para editar solicitudes');
+        }
+
+        if (!itemId) {
+            throw new Error('Falta el ID de la solicitud a actualizar');
         }
 
         const siteId = await getSiteId();
@@ -229,6 +297,15 @@ async function updateSolicitudEnSharePoint(itemId, updates) {
         
         if (updates.notasCT !== undefined) {
             fields.NotasCT = updates.notasCT;
+        }
+
+        if (Object.keys(fields).length === 0) {
+            console.warn('⚠️ No hay campos para actualizar');
+            return;
+        }
+
+        if (CONFIG.options.debug) {
+            console.log('📤 Actualizando solicitud:', itemId, fields);
         }
 
         await callGraph(
@@ -257,6 +334,10 @@ async function getSolicitudesUsuario() {
         const siteId = await getSiteId();
         const email = userState.profile.email;
 
+        if (!email) {
+            throw new Error('No se pudo obtener el email del usuario');
+        }
+
         const query = `/sites/${siteId}/lists/${CONFIG.sharepoint.listName}/items?` +
             `$filter=fields/EmailUsuarioM365 eq '${email}'` +
             `&$select=id,fields` +
@@ -272,7 +353,7 @@ async function getSolicitudesUsuario() {
         }));
 
         if (CONFIG.options.debug) {
-            console.log(`✅ Solicitudes obtenidas: ${solicitudes.length}`);
+            console.log(`✅ Solicitudes del usuario obtenidas: ${solicitudes.length}`);
         }
 
         return solicitudes;
@@ -328,6 +409,19 @@ async function getAllSolicitudes() {
  */
 async function sendEmailViaGraph(to, subject, htmlBody, ccEmails = []) {
     try {
+        // Validar parámetros
+        if (!to) {
+            throw new Error('Falta el destinatario del email');
+        }
+
+        if (!subject) {
+            throw new Error('Falta el asunto del email');
+        }
+
+        if (!htmlBody) {
+            throw new Error('Falta el contenido del email');
+        }
+
         const emailData = {
             message: {
                 subject: subject,
@@ -350,10 +444,17 @@ async function sendEmailViaGraph(to, subject, htmlBody, ccEmails = []) {
             }));
         }
 
+        if (CONFIG.options.debug) {
+            console.log('📤 Enviando email a:', to);
+            if (ccEmails.length > 0) {
+                console.log('   CC:', ccEmails.join(', '));
+            }
+        }
+
         await callGraph('/me/sendMail', 'POST', emailData);
 
         if (CONFIG.options.debug) {
-            console.log('✅ Email enviado a:', to);
+            console.log('✅ Email enviado exitosamente');
         }
 
     } catch (error) {
@@ -563,4 +664,12 @@ function buildAdminNotificationHTML(formData, folio, tipoTramite, pdfUrl) {
             </p>
         </div>
     </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOG DE VERSIÓN
+// ═══════════════════════════════════════════════════════════════
+if (CONFIG.options.debug) {
+    console.log('📦 sharepoint.js v1.1 cargado');
+    console.log('🔗 Site URL:', CONFIG.sharepoint.siteUrl);
 }
