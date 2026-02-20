@@ -10,7 +10,7 @@ const CONFIG = {
     // ━━━ AZURE ACTIVE DIRECTORY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // Obtener en: https://portal.azure.com
     azure: {
-        clientId: '0681dda0-70f4-4038-b901-d41ee738cc2e'  // ← App Registration → Overview
+        clientId: '0681dda0-70f4-4038-b901-d41ee738cc2e',  // ← App Registration → Overview
         tenantId: '3af6b5a8-d84b-4cfa-9942-c6af8638c3e8',  // ← App Registration → Overview
         
         // ⚠️ NO MODIFICAR estos permisos
@@ -67,7 +67,7 @@ const CONFIG = {
         nombre:      'Centro de Investigaciones Tropicales',
         nombreCorto: 'CITRO',
         universidad: 'Universidad Veracruzana',
-        email:       'ctecnicocitro@uv.mx,
+        email:       'ctecnicocitro@uv.mx',
         telefono:    '228-842-1800',
         direccion:   'Xalapa, Veracruz, México',
         sitioWeb:    'https://www.uv.mx/citro'
@@ -102,7 +102,7 @@ const CONFIG = {
         requiereJustificacionSi: 50000,  // MXN - solicitar justificación si excede
         
         // Modo debug (mostrar logs en consola)
-        debug: false,
+        debug: true,  // ← Activado para ver logs
         
         // Cache de datos (minutos)
         cacheDuration: 5
