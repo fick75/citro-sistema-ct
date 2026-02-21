@@ -7,7 +7,7 @@
 - ═══════════════════════════════════════════════════════════════
   */
 
-const CONFIG = {
+const pdfUrl = await uploadPDFToOneDrive(pdfBlob, folio, tipo);
 
 ```
 // ━━━ AZURE ACTIVE DIRECTORY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
