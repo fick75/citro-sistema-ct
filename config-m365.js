@@ -10,7 +10,7 @@ const CONFIG = {
     
     // ━━━ AZURE ACTIVE DIRECTORY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     azure: {
-        clientId: '0681dda0-70f4-4038-b901-d41ee738cc2',
+        clientId: '0681dda0-70f4-4038-b901-d41ee738cc2e',
         tenantId: '3c907651-d8c6-4ca6-a8a4-6a242430e653',
         
         scopes: [
