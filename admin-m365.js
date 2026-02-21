@@ -1,147 +1,306 @@
 /**
- * CITRO — Panel de Administración (SharePoint + Graph)
+ * ═══════════════════════════════════════════════════════════════
+ * CITRO — Panel de Administración
+ * Gestión de solicitudes para administradores
+ * Universidad Veracruzana
+ * ═══════════════════════════════════════════════════════════════
  */
-let allSolicitudes = [];
-let currentEditId  = null;
 
-async function loadAdminData() {
-    document.getElementById('loading-row').style.display = '';
+// ════════════════════════════════════════════════════════════════
+// PANEL DE ADMINISTRACIÓN
+// ════════════════════════════════════════════════════════════════
+
+/**
+ * Ir al panel de administración
+ */
+async function goToAdminPanel() {
+    // Verificar permisos
+    if (!userState.isAdmin) {
+        alert('⛔ No tienes permisos de administrador');
+        goToHome();
+        return;
+    }
+
+    if (CONFIG.options.debug) {
+        console.log('👑 Cargando panel de administración...');
+    }
+
+    showSection('admin-panel');
+    showLoading(true);
+
     try {
-        allSolicitudes = await getAllSolicitudes();
-        updateStats(allSolicitudes);
-        renderTable(allSolicitudes);
-    } catch(e) {
-        document.getElementById('admin-table-body').innerHTML =
-            `<tr><td colspan="9" style="text-align:center;padding:40px;color:#A80000">Error cargando SharePoint: ${e.message}</td></tr>`;
+        // Cargar todas las solicitudes
+        const solicitudes = await getAllSolicitudes();
+        
+        if (CONFIG.options.debug) {
+            console.log(`✅ ${solicitudes.length} solicitudes cargadas`);
+        }
+
+        renderAdminPanel(solicitudes);
+
+    } catch (error) {
+        console.error('❌ Error al cargar panel admin:', error);
+        alert('Error al cargar solicitudes:\n' + error.message);
+    } finally {
+        showLoading(false);
     }
 }
 
-function updateStats(data) {
-    const aut = data.filter(s=>s.Estado==='Aprobado').reduce((s,r)=>s+parseFloat(r.MontoAutorizado||0),0);
-    document.getElementById('total-autorizado').textContent  = `$${aut.toLocaleString('es-MX')} MXN`;
-    document.getElementById('total-solicitudes').textContent = data.length;
-    document.getElementById('total-pendientes').textContent  = data.filter(s=>!s.Estado||['Pendiente','En Revisión'].includes(s.Estado)).length;
-    document.getElementById('total-aprobadas').textContent   = data.filter(s=>s.Estado==='Aprobado').length;
+/**
+ * Renderizar panel de administración
+ */
+function renderAdminPanel(solicitudes) {
+    const content = document.getElementById('admin-panel-content');
+    
+    if (!content) {
+        console.error('❌ Elemento admin-panel-content no encontrado');
+        return;
+    }
+
+    // Estadísticas
+    const pendientes = solicitudes.filter(s => s.Estado === 'Pendiente').length;
+    const aprobadas = solicitudes.filter(s => s.Estado === 'Aprobado').length;
+    const rechazadas = solicitudes.filter(s => s.Estado === 'Rechazado').length;
+
+    let html = `
+        <div style="margin-bottom: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                <div style="background: #FFF4CE; padding: 20px; border-radius: 8px; border-left: 4px solid #FFB900;">
+                    <div style="font-size: 32px; font-weight: 700; color: #7A4F01;">${pendientes}</div>
+                    <div style="color: #605E5C;">Pendientes</div>
+                </div>
+                <div style="background: #DFF6DD; padding: 20px; border-radius: 8px; border-left: 4px solid #107C10;">
+                    <div style="font-size: 32px; font-weight: 700; color: #107C10;">${aprobadas}</div>
+                    <div style="color: #605E5C;">Aprobadas</div>
+                </div>
+                <div style="background: #FDE7D9; padding: 20px; border-radius: 8px; border-left: 4px solid #D83B01;">
+                    <div style="font-size: 32px; font-weight: 700; color: #D83B01;">${rechazadas}</div>
+                    <div style="color: #605E5C;">Rechazadas</div>
+                </div>
+                <div style="background: #EBF3FB; padding: 20px; border-radius: 8px; border-left: 4px solid #0078D4;">
+                    <div style="font-size: 32px; font-weight: 700; color: #0078D4;">${solicitudes.length}</div>
+                    <div style="color: #605E5C;">Total</div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 16px; display: flex; gap: 12px; align-items: center;">
+                <button onclick="exportToExcel()" class="btn btn-primary" style="display: flex; align-items: center; gap: 8px;">
+                    📊 Exportar a Excel
+                </button>
+                <button onclick="goToHome()" class="btn btn-secondary">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </div>
+
+        <div style="background: white; border: 1px solid #EDEBE9; border-radius: 8px; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                <thead>
+                    <tr style="background: #F3F2F1; border-bottom: 2px solid #EDEBE9;">
+                        <th style="padding: 12px; text-align: left; font-weight: 600;">Folio</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600;">Fecha</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600;">Tipo</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600;">Solicitante</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600;">Monto</th>
+                        <th style="padding: 12px; text-align: left; font-weight: 600;">Estado</th>
+                        <th style="padding: 12px; text-align: center; font-weight: 600;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    if (solicitudes.length === 0) {
+        html += `
+            <tr>
+                <td colspan="7" style="padding: 40px; text-align: center; color: #605E5C;">
+                    No hay solicitudes registradas
+                </td>
+            </tr>
+        `;
+    } else {
+        solicitudes.forEach((solicitud, index) => {
+            const fecha = solicitud.FechaSolicitud ? 
+                new Date(solicitud.FechaSolicitud).toLocaleDateString('es-MX') : '—';
+            
+            const monto = solicitud.MontoSolicitado ? 
+                `$${parseFloat(solicitud.MontoSolicitado).toLocaleString('es-MX')}` : '—';
+
+            const estadoColor = {
+                'Pendiente': 'background: #FFF4CE; color: #7A4F01;',
+                'Aprobado': 'background: #DFF6DD; color: #107C10;',
+                'Rechazado': 'background: #FDE7D9; color: #D83B01;'
+            }[solicitud.Estado] || '';
+
+            html += `
+                <tr style="border-bottom: 1px solid #EDEBE9; ${index % 2 === 0 ? 'background: #FAF9F8;' : ''}">
+                    <td style="padding: 12px; font-family: monospace; font-weight: 600; color: #0078D4;">
+                        ${solicitud.Folio || '—'}
+                    </td>
+                    <td style="padding: 12px;">${fecha}</td>
+                    <td style="padding: 12px;">${solicitud.TipoTramite || '—'}</td>
+                    <td style="padding: 12px;">${solicitud.NombreSolicitante || '—'}</td>
+                    <td style="padding: 12px; font-weight: 600;">${monto}</td>
+                    <td style="padding: 12px;">
+                        <span style="padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; ${estadoColor}">
+                            ${solicitud.Estado || 'Pendiente'}
+                        </span>
+                    </td>
+                    <td style="padding: 12px; text-align: center;">
+                        ${solicitud.URLPdf ? 
+                            `<a href="${solicitud.URLPdf}" target="_blank" style="color: #0078D4; text-decoration: none; margin-right: 8px;">📄 Ver PDF</a>` : 
+                            ''
+                        }
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    html += `
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    content.innerHTML = html;
 }
 
-function renderTable(data) {
-    const tbody = document.getElementById('admin-table-body');
-    if (!data.length) { tbody.innerHTML='<tr><td colspan="9" style="text-align:center;padding:40px;color:#888">Sin solicitudes</td></tr>'; return; }
-    tbody.innerHTML = data.map(s => {
-        const mS = s.MontoSolicitado>0  ? `$${parseFloat(s.MontoSolicitado).toLocaleString('es-MX')}`:'—';
-        const mA = s.MontoAutorizado>0 && s.Estado==='Aprobado' ? `$${parseFloat(s.MontoAutorizado).toLocaleString('es-MX')}`:'—';
-        const nEsc = (s.NotasCT||'').replace(/'/g,"\\'");
-        return `<tr>
-            <td><span class="folio-badge">${s.Folio||'—'}</span></td>
-            <td>${s.FechaSolicitud?new Date(s.FechaSolicitud).toLocaleDateString('es-MX'):'—'}</td>
-            <td><span class="tipo-badge ${tipoCls(s.TipoTramite)}">${s.TipoTramite||'—'}</span></td>
-            <td>${s.NombreSolicitante||'—'}</td>
-            <td><a href="mailto:${s.EmailSolicitante}">${s.EmailSolicitante||'—'}</a></td>
-            <td>${mS}</td>
-            <td><span class="estado-badge ${estadoCls(s.Estado)}">${s.Estado||'Pendiente'}</span></td>
-            <td>${mA}</td>
-            <td class="actions-cell">
-                <button class="btn-action btn-edit" onclick="openEditModal('${s.spId}','${s.Estado||'Pendiente'}',${s.MontoAutorizado||0},'${nEsc}')" title="Editar">✏️</button>
-                ${s.URLPdf?`<button class="btn-action" onclick="window.open('${s.URLPdf}','_blank')" title="Ver PDF">📄</button>`:''}
-            </td></tr>`;
-    }).join('');
-}
+// ════════════════════════════════════════════════════════════════
+// MIS SOLICITUDES
+// ════════════════════════════════════════════════════════════════
 
-function filterAdmin() {
-    const q = document.getElementById('search-filter').value.toLowerCase();
-    const st = document.getElementById('status-filter').value;
-    const tp = document.getElementById('type-filter').value;
-    const filtered = allSolicitudes.filter(s =>
-        (!q  || `${s.Folio}${s.NombreSolicitante}${s.EmailSolicitante}`.toLowerCase().includes(q)) &&
-        (!st || s.Estado===st) && (!tp || s.TipoTramite===tp)
-    );
-    updateStats(filtered);
-    renderTable(filtered);
-}
+/**
+ * Ir a "Mis Solicitudes"
+ */
+async function goToMisSolicitudes() {
+    if (!userState.isLoggedIn) {
+        alert('⚠️ Debes iniciar sesión primero');
+        signInWithMicrosoft();
+        return;
+    }
 
-function openEditModal(spId, estado, monto, notas) {
-    currentEditId = spId;
-    document.getElementById('edit-sharepoint-id').value = spId;
-    document.getElementById('edit-status').value         = estado;
-    document.getElementById('edit-monto').value          = monto;
-    document.getElementById('edit-notas').value          = notas;
-    document.getElementById('edit-modal').classList.add('show');
-}
-function closeEditModal() { document.getElementById('edit-modal').classList.remove('show'); currentEditId=null; }
+    if (CONFIG.options.debug) {
+        console.log('📋 Cargando mis solicitudes...');
+    }
 
-async function saveEdit() {
-    if (!currentEditId) return;
+    showSection('mis-solicitudes');
     showLoading(true);
+
     try {
-        const estado    = document.getElementById('edit-status').value;
-        const monto     = document.getElementById('edit-monto').value;
-        const notas     = document.getElementById('edit-notas').value;
-        const notificar = document.getElementById('edit-notify').value;
-        await updateSolicitudEnSharePoint(currentEditId, { estado, montoAutorizado:monto, notasCT:notas });
-        if (notificar==='si') {
-            const sol = allSolicitudes.find(s=>s.spId===currentEditId);
-            if (sol) await notifyEstadoChange(sol, estado, monto, notas);
+        const solicitudes = await getSolicitudesUsuario();
+        
+        if (CONFIG.options.debug) {
+            console.log(`✅ ${solicitudes.length} solicitudes cargadas`);
         }
-        const i = allSolicitudes.findIndex(s=>s.spId===currentEditId);
-        if (i>=0) Object.assign(allSolicitudes[i],{Estado:estado,MontoAutorizado:parseFloat(monto)||0,NotasCT:notas});
-        updateStats(allSolicitudes); renderTable(allSolicitudes);
-        closeEditModal(); showToast('✅ Guardado en SharePoint');
-    } catch(e) { alert('Error: '+e.message); }
-    finally { showLoading(false); }
+
+        renderMisSolicitudes(solicitudes);
+
+    } catch (error) {
+        console.error('❌ Error al cargar solicitudes:', error);
+        alert('Error al cargar tus solicitudes:\n' + error.message);
+    } finally {
+        showLoading(false);
+    }
 }
 
-async function notifyEstadoChange(sol, estado, monto, notas) {
-    if (!sol.EmailSolicitante) return;
-    const emo = {Aprobado:'✅',Rechazado:'❌','En Revisión':'🔍',Pendiente:'⏳'}[estado]||'📋';
-    const html = `<div style="font-family:Segoe UI,sans-serif;max-width:580px;margin:0 auto;border:1px solid #EDEBE9;border-radius:8px;overflow:hidden">
-        <div style="background:#0078D4;padding:22px"><h2 style="color:#fff;margin:0">${emo} Actualización de Solicitud</h2></div>
-        <div style="padding:24px">
-        <p>Estimado/a <strong>${sol.NombreSolicitante}</strong>,</p>
-        <p>El <strong>H. Consejo Técnico del CITRO</strong> ha actualizado el estado de su solicitud:</p>
-        <table style="width:100%;border-collapse:collapse;background:#FAF9F8;border-radius:6px;margin:16px 0;font-size:14px">
-        <tr><td style="padding:9px 12px;font-weight:600;width:40%">Folio:</td><td style="padding:9px 12px">${sol.Folio}</td></tr>
-        <tr style="background:#F3F2F1"><td style="padding:9px 12px;font-weight:600">Nuevo Estado:</td><td style="padding:9px 12px"><strong>${emo} ${estado}</strong></td></tr>
-        ${estado==='Aprobado'&&monto>0?`<tr><td style="padding:9px 12px;font-weight:600">Monto Autorizado:</td><td style="padding:9px 12px;color:#107C10;font-weight:700">$${parseFloat(monto).toLocaleString('es-MX')} MXN</td></tr>`:''}
-        ${notas?`<tr style="background:#F3F2F1"><td style="padding:9px 12px;font-weight:600">Notas del CT:</td><td style="padding:9px 12px">${notas}</td></tr>`:''}
-        </table></div>
-        <div style="background:#FAF9F8;padding:14px;text-align:center;border-top:1px solid #EDEBE9"><p style="margin:0;font-size:12px;color:#888">CITRO · Universidad Veracruzana</p></div></div>`;
-    await sendEmailViaGraph(sol.EmailSolicitante, `CITRO — Actualización de solicitud (${sol.Folio})`, html);
-}
+/**
+ * Renderizar "Mis Solicitudes"
+ */
+function renderMisSolicitudes(solicitudes) {
+    const content = document.getElementById('mis-solicitudes-content');
+    
+    if (!content) {
+        console.error('❌ Elemento mis-solicitudes-content no encontrado');
+        return;
+    }
 
-async function loadUserSolicitudes() {
-    const c = document.getElementById('solicitudes-list');
-    c.innerHTML = '<div style="text-align:center;padding:40px"><div class="spinner-small"></div> Cargando desde SharePoint...</div>';
-    try {
-        const data = await getSolicitudesUsuario();
-        if (!data.length) {
-            c.innerHTML = `<div class="empty-state"><div style="font-size:48px;margin-bottom:16px">📋</div><h3>Sin solicitudes</h3><p>Envía tu primera solicitud al Consejo Técnico</p><button class="btn-primary-large" onclick="goToHome()">Nueva Solicitud</button></div>`;
-            return;
-        }
-        c.innerHTML = data.map(s => {
-            const mS = s.MontoSolicitado>0 ? `$${parseFloat(s.MontoSolicitado).toLocaleString('es-MX')} MXN`:null;
-            const mA = s.MontoAutorizado>0&&s.Estado==='Aprobado' ? `<div class="card-monto-aut">💰 <strong>Autorizado:</strong> $${parseFloat(s.MontoAutorizado).toLocaleString('es-MX')} MXN</div>`:'';
-            return `<div class="solicitud-card">
-                <div class="solicitud-header">
-                    <div><span class="folio-badge">${s.Folio}</span> <span class="tipo-badge ${tipoCls(s.TipoTramite)}">${s.TipoTramite}</span></div>
-                    <span class="estado-badge ${estadoCls(s.Estado)}">${s.Estado||'Pendiente'}</span>
+    let html = `
+        <div style="margin-bottom: 24px;">
+            <p style="color: #605E5C;">Has enviado <strong>${solicitudes.length}</strong> solicitud(es) al Consejo Técnico.</p>
+        </div>
+    `;
+
+    if (solicitudes.length === 0) {
+        html += `
+            <div style="background: #EBF3FB; border-left: 4px solid #0078D4; padding: 24px; border-radius: 0 8px 8px 0;">
+                <p style="margin: 0; color: #323130;">
+                    No has enviado ninguna solicitud aún.
+                </p>
+                <button onclick="goToHome()" class="btn btn-primary" style="margin-top: 16px;">
+                    📝 Crear Nueva Solicitud
+                </button>
+            </div>
+        `;
+    } else {
+        html += `<div style="display: grid; gap: 16px;">`;
+
+        solicitudes.forEach(solicitud => {
+            const fecha = solicitud.FechaSolicitud ? 
+                new Date(solicitud.FechaSolicitud).toLocaleDateString('es-MX', { 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                }) : '—';
+
+            const monto = solicitud.MontoSolicitado ? 
+                `$${parseFloat(solicitud.MontoSolicitado).toLocaleString('es-MX')} MXN` : null;
+
+            const estadoColor = {
+                'Pendiente': '#FFB900',
+                'Aprobado': '#107C10',
+                'Rechazado': '#D83B01'
+            }[solicitud.Estado] || '#605E5C';
+
+            html += `
+                <div style="background: white; border: 1px solid #EDEBE9; border-radius: 8px; padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0 0 8px; font-size: 18px; color: #323130;">
+                                ${solicitud.TipoTramite || 'Solicitud'}
+                            </h3>
+                            <p style="margin: 0; color: #605E5C; font-size: 14px;">
+                                Folio: <strong style="color: #0078D4; font-family: monospace;">${solicitud.Folio}</strong>
+                            </p>
+                        </div>
+                        <span style="padding: 6px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; background: ${estadoColor}15; color: ${estadoColor};">
+                            ${solicitud.Estado || 'Pendiente'}
+                        </span>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px; font-size: 14px;">
+                        <div>
+                            <div style="color: #605E5C; font-size: 12px; margin-bottom: 4px;">Fecha de Solicitud</div>
+                            <div style="font-weight: 600;">${fecha}</div>
+                        </div>
+                        ${monto ? `
+                        <div>
+                            <div style="color: #605E5C; font-size: 12px; margin-bottom: 4px;">Monto Solicitado</div>
+                            <div style="font-weight: 600; color: #107C10;">${monto}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    ${solicitud.URLPdf ? `
+                    <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #EDEBE9;">
+                        <a href="${solicitud.URLPdf}" target="_blank" class="btn btn-secondary" style="display: inline-block; text-decoration: none;">
+                            📄 Ver Documento
+                        </a>
+                    </div>
+                    ` : ''}
                 </div>
-                <div class="solicitud-body">
-                    <div>📅 ${s.FechaSolicitud?new Date(s.FechaSolicitud).toLocaleDateString('es-MX',{dateStyle:'long'}):'—'}</div>
-                    ${mS?`<div>💵 Solicitado: <strong>${mS}</strong></div>`:''}
-                    ${mA}
-                    ${s.NotasCT?`<div class="card-notas"><strong>Notas del CT:</strong> ${s.NotasCT}</div>`:''}
-                </div>
-                ${s.URLPdf?`<div class="solicitud-footer"><a href="${s.URLPdf}" target="_blank" class="btn-nav-secondary">📄 Ver PDF en SharePoint</a></div>`:''}
-            </div>`;
-        }).join('');
-    } catch(e) { c.innerHTML = `<div style="padding:20px;color:#A80000">Error: ${e.message}</div>`; }
+            `;
+        });
+
+        html += `</div>`;
+    }
+
+    content.innerHTML = html;
 }
 
-function estadoCls(e) { return {Aprobado:'estado-aprobado',Rechazado:'estado-rechazado','En Revisión':'estado-revision'}[e]||'estado-pendiente'; }
-function tipoCls(t)   { return {'Apoyo Académico':'tipo-green','Aval Institucional':'tipo-blue','Apoyo a Terceros':'tipo-purple','Comité Tutorial':'tipo-teal','Solicitud Libre':'tipo-orange'}[t]||'tipo-green'; }
-function showToast(msg) {
-    const d = Object.assign(document.createElement('div'),{ textContent:msg });
-    d.style.cssText='position:fixed;bottom:24px;right:24px;background:#107C10;color:#fff;padding:13px 22px;border-radius:6px;box-shadow:0 4px 12px rgba(0,0,0,.2);z-index:9999;font-weight:600;font-family:Segoe UI,sans-serif';
-    document.body.appendChild(d); setTimeout(()=>d.remove(),3500);
+// ════════════════════════════════════════════════════════════════
+// LOG DE INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════════
+
+if (CONFIG?.options?.debug) {
+    console.log('📦 admin-m365.js cargado');
 }
-document.addEventListener('click', e => { if (e.target===document.getElementById('edit-modal')) closeEditModal(); });
