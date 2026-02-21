@@ -1,3 +1,20 @@
+Términos y Condiciones de Uso
+Sistema de Gestión de Solicitudes CITRO
+Última actualización: Febrero 2026
+Universidad Veracruzana
+Centro de Investigaciones Tropicales (CITRO)
+1. Aceptación de los Términos
+Al acceder y utilizar el Sistema de Gestión de Solicitudes CITRO, usted acepta estos Términos y Condiciones en su totalidad.
+
+📞 Contacto
+Centro de Investigaciones Tropicales (CITRO)
+Universidad Veracruzana
+Email: ctecnicocitro@uv.mx
+Teléfono: 228-842-1800
+
+
+
+
 # 🎓 SISTEMA CITRO M365
 
 Sistema de Gestión de Solicitudes para el H. Consejo Técnico del Centro de Investigaciones Tropicales (CITRO), Universidad Veracruzana.
