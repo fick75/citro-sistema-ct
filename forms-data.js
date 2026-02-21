@@ -1,372 +1,333 @@
 /**
  * ═══════════════════════════════════════════════════════════════
- * CITRO - Configuración de Formularios V2.0
- * Incluye 5 tipos de formularios
+ * CITRO — Configuración de Formularios
+ * Definición de todos los formularios del sistema
+ * Universidad Veracruzana
  * ═══════════════════════════════════════════════════════════════
  */
 
 const FORMS_CONFIG = {
+    
+    // ━━━ APOYO ACADÉMICO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     apoyo_academico: {
-        title: 'Solicitud de Apoyo a Actividades Académicas',
-        subtitle: 'Para viáticos, congresos, estancias y trabajo de campo',
+        title: 'Apoyo Académico',
+        subtitle: 'Solicitud de apoyo para actividades académicas, congresos, viajes de investigación',
         fields: [
             {
-                name: 'nombre_completo',
-                label: 'Nombre completo del solicitante',
-                type: 'text',
-                required: true,
-                placeholder: 'Ej: Ana María García López'
-            },
-            {
-                name: 'correo',
-                label: 'Correo electrónico',
-                type: 'email',
-                required: true,
-                placeholder: 'ejemplo@uv.mx'
-            },
-            {
                 name: 'tipo_solicitante',
-                label: 'Tipo de solicitante',
+                label: 'Tipo de Solicitante',
                 type: 'select',
                 required: true,
                 options: [
+                    'Estudiante de Licenciatura',
                     'Estudiante de Maestría',
                     'Estudiante de Doctorado',
-                    'Académico/Investigador',
+                    'Académico',
                     'Técnico Académico',
+                    'Personal Administrativo'
+                ]
+            },
+            {
+                name: 'nombre_completo',
+                label: 'Nombre Completo',
+                type: 'text',
+                required: true,
+                placeholder: 'Nombre completo del solicitante'
+            },
+            {
+                name: 'correo',
+                label: 'Correo Electrónico',
+                type: 'email',
+                required: true,
+                placeholder: 'correo@uv.mx'
+            },
+            {
+                name: 'matricula',
+                label: 'Matrícula / Número de Personal',
+                type: 'text',
+                required: true,
+                placeholder: 'Matrícula o número de personal'
+            },
+            {
+                name: 'titulo_actividad',
+                label: 'Título de la Actividad',
+                type: 'text',
+                required: true,
+                placeholder: 'Nombre del congreso, evento, viaje, etc.'
+            },
+            {
+                name: 'tipo_actividad',
+                label: 'Tipo de Actividad',
+                type: 'select',
+                required: true,
+                options: [
+                    'Congreso',
+                    'Conferencia',
+                    'Taller',
+                    'Curso',
+                    'Estancia de Investigación',
+                    'Trabajo de Campo',
                     'Otro'
                 ]
             },
             {
-                name: 'matricula',
-                label: 'Matrícula o número de personal',
-                type: 'text',
-                required: true,
-                placeholder: 'Ej: S20012345'
-            },
-            {
-                name: 'tipo_actividad',
-                label: 'Tipo de actividad',
-                type: 'select',
-                required: true,
-                options: [
-                    'Asistencia a evento académico (congreso, simposio, etc.)',
-                    'Presentación de trabajo en evento',
-                    'Curso o taller',
-                    'Trabajo de campo',
-                    'Estancia académica o de investigación',
-                    'Otra'
-                ]
-            },
-            {
-                name: 'titulo_actividad',
-                label: 'Título de la actividad',
-                type: 'text',
-                required: true,
-                placeholder: 'Nombre del evento, curso, estancia, etc.'
-            },
-            {
                 name: 'fecha_inicio',
-                label: 'Fecha de inicio',
+                label: 'Fecha de Inicio',
                 type: 'date',
                 required: true
             },
             {
-                name: 'fecha_termino',
-                label: 'Fecha de término',
+                name: 'fecha_fin',
+                label: 'Fecha de Fin',
                 type: 'date',
-                required: true
+                required: false
             },
             {
                 name: 'destino',
-                label: 'Lugar/destino',
+                label: 'Destino (Ciudad, Estado, País)',
                 type: 'text',
                 required: true,
-                placeholder: 'Ciudad, Estado, País'
+                placeholder: 'Ej: Monterrey, N.L., México'
             },
             {
-                name: 'justificacion',
-                label: 'Justificación de la solicitud',
-                type: 'textarea',
-                required: true,
-                rows: 5,
-                placeholder: 'Explique por qué es importante esta actividad para su formación o investigación'
-            },
-            {
-                name: 'proyecto_sirei',
-                label: 'Proyecto SiREI asociado (si aplica)',
+                name: 'institucion_anfitriona',
+                label: 'Institución Organizadora',
                 type: 'text',
                 required: false,
-                placeholder: 'Número de proyecto'
-            },
-            {
-                name: 'desglose_gastos',
-                label: 'Desglose de gastos',
-                type: 'textarea',
-                required: true,
-                rows: 4,
-                placeholder: 'Ej: Transporte: $5,000 MXN\nHospedaje (3 noches): $3,000 MXN\nInscripción: $2,000 MXN',
-                help: 'Incluya concepto y monto estimado de cada gasto'
+                placeholder: 'Nombre de la institución que organiza'
             },
             {
                 name: 'monto_total',
-                label: 'Monto total solicitado (MXN)',
+                label: 'Monto Total Solicitado (MXN)',
                 type: 'number',
                 required: true,
-                placeholder: '10000'
+                placeholder: '0.00',
+                help: 'Incluir transporte, hospedaje, registro, etc.'
+            },
+            {
+                name: 'desglose_gastos',
+                label: 'Desglose de Gastos',
+                type: 'textarea',
+                rows: 4,
+                required: true,
+                placeholder: 'Transporte: $X, Hospedaje: $Y, Registro: $Z, etc.'
+            },
+            {
+                name: 'justificacion',
+                label: 'Justificación de la Solicitud',
+                type: 'textarea',
+                rows: 5,
+                required: true,
+                placeholder: 'Explique la importancia y beneficios de la actividad para su formación académica o investigación'
             }
         ]
     },
     
+    // ━━━ AVAL INSTITUCIONAL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     aval_institucional: {
-        title: 'Solicitud de Aval Institucional',
-        subtitle: 'Para representar al CITRO / UV en eventos académicos',
+        title: 'Aval Institucional',
+        subtitle: 'Respaldo oficial para representar al CITRO en eventos académicos',
         fields: [
             {
+                name: 'tipo_solicitante',
+                label: 'Tipo de Solicitante',
+                type: 'select',
+                required: true,
+                options: [
+                    'Estudiante de Licenciatura',
+                    'Estudiante de Maestría',
+                    'Estudiante de Doctorado',
+                    'Académico',
+                    'Técnico Académico'
+                ]
+            },
+            {
                 name: 'nombre_completo',
-                label: 'Nombre completo del solicitante',
+                label: 'Nombre Completo',
+                type: 'text',
+                required: true,
+                placeholder: 'Nombre completo del solicitante'
+            },
+            {
+                name: 'correo',
+                label: 'Correo Electrónico',
+                type: 'email',
+                required: true,
+                placeholder: 'correo@uv.mx'
+            },
+            {
+                name: 'matricula',
+                label: 'Matrícula / Número de Personal',
                 type: 'text',
                 required: true
             },
             {
-                name: 'correo',
-                label: 'Correo electrónico',
-                type: 'email',
-                required: true
+                name: 'titulo_actividad',
+                label: 'Nombre del Evento',
+                type: 'text',
+                required: true,
+                placeholder: 'Nombre completo del evento o actividad'
             },
             {
-                name: 'tipo_solicitante',
-                label: 'Tipo de solicitante',
+                name: 'tipo_participacion',
+                label: 'Tipo de Participación',
                 type: 'select',
                 required: true,
                 options: [
-                    'Estudiante de Maestría',
-                    'Estudiante de Doctorado',
-                    'Académico/Investigador',
-                    'Egresado',
+                    'Ponencia Oral',
+                    'Póster',
+                    'Taller',
+                    'Mesa Redonda',
+                    'Conferencia Magistral',
+                    'Asistente',
+                    'Organizador',
                     'Otro'
                 ]
             },
             {
-                name: 'matricula',
-                label: 'Matrícula o número de personal',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'tipo_participacion',
-                label: 'Tipo de participación',
-                type: 'select',
-                required: true,
-                options: [
-                    'Ponencia oral',
-                    'Presentación de póster',
-                    'Organización de evento',
-                    'Impartición de clase/taller',
-                    'Moderador/Comentarista',
-                    'Otra'
-                ]
-            },
-            {
-                name: 'nombre_evento',
-                label: 'Nombre del evento',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'fecha_inicio',
-                label: 'Fecha de inicio',
+                name: 'fecha_actividad',
+                label: 'Fecha del Evento',
                 type: 'date',
                 required: true
             },
             {
-                name: 'fecha_termino',
-                label: 'Fecha de término',
-                type: 'date',
-                required: true
-            },
-            {
-                name: 'descripcion',
-                label: 'Descripción de la participación',
-                type: 'textarea',
+                name: 'lugar',
+                label: 'Lugar (Ciudad, Estado, País)',
+                type: 'text',
                 required: true,
-                rows: 4,
-                placeholder: 'Título de la ponencia, taller, o descripción de la actividad'
+                placeholder: 'Ej: Ciudad de México, CDMX, México'
             },
             {
-                name: 'relevancia',
-                label: 'Relevancia para el CITRO',
-                type: 'textarea',
+                name: 'institucion_organizadora',
+                label: 'Institución Organizadora',
+                type: 'text',
                 required: true,
-                rows: 4,
-                placeholder: 'Explique cómo esta participación beneficia al centro'
+                placeholder: 'Nombre de la institución que organiza'
             },
             {
-                name: 'lgac',
-                label: 'LGAC relacionada',
-                type: 'select',
+                name: 'titulo_trabajo',
+                label: 'Título del Trabajo a Presentar',
+                type: 'textarea',
+                rows: 2,
                 required: false,
-                options: [
-                    'Biodiversidad y Conservación',
-                    'Ecología Funcional',
-                    'Cambio Global',
-                    'No aplica'
-                ]
+                placeholder: 'Si aplica'
+            },
+            {
+                name: 'justificacion',
+                label: 'Justificación',
+                type: 'textarea',
+                rows: 5,
+                required: true,
+                placeholder: 'Explique por qué requiere el aval institucional del CITRO'
             }
         ]
     },
     
+    // ━━━ APOYO A TERCEROS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     apoyo_terceros: {
-        title: 'Solicitud de Apoyo a Terceros — CITRO',
-        subtitle: 'Para invitar ponentes o colaboradores externos',
+        title: 'Apoyo a Terceros',
+        subtitle: 'Apoyo para colaboradores externos o instituciones',
         fields: [
             {
                 name: 'nombre_solicitante',
-                label: 'Nombre del solicitante (quien solicita el apoyo)',
+                label: 'Tu Nombre (Solicitante UV)',
                 type: 'text',
-                required: true
+                required: true,
+                placeholder: 'Académico o estudiante UV que solicita'
             },
             {
                 name: 'correo_solicitante',
-                label: 'Correo del solicitante',
+                label: 'Tu Correo Electrónico',
                 type: 'email',
-                required: true
+                required: true,
+                placeholder: 'tu_correo@uv.mx'
             },
             {
-                name: 'matricula',
-                label: 'Matrícula o número de personal',
+                name: 'adscripcion_solicitante',
+                label: 'Tu Adscripción',
                 type: 'text',
-                required: true
+                required: true,
+                placeholder: 'Ej: Posgrado en Ecología Tropical'
             },
             {
-                name: 'nombre_tercero',
-                label: 'Nombre completo del tercero (persona a apoyar)',
+                name: 'nombre_beneficiario',
+                label: 'Nombre del Beneficiario (Tercero)',
                 type: 'text',
-                required: true
+                required: true,
+                placeholder: 'Nombre de la persona o institución externa'
             },
             {
-                name: 'correo_tercero',
-                label: 'Correo del tercero',
-                type: 'email',
-                required: true
-            },
-            {
-                name: 'institucion_tercero',
-                label: 'Institución del tercero',
+                name: 'institucion_beneficiario',
+                label: 'Institución del Beneficiario',
                 type: 'text',
-                required: true
+                required: true,
+                placeholder: 'Institución a la que pertenece'
             },
             {
-                name: 'relacion',
-                label: 'Relación con el solicitante',
+                name: 'tipo_apoyo',
+                label: 'Tipo de Apoyo Solicitado',
                 type: 'select',
                 required: true,
                 options: [
-                    'Director de tesis',
-                    'Co-tutor',
-                    'Asesor externo',
-                    'Colaborador de investigación',
-                    'Ponente invitado',
-                    'Otra'
+                    'Apoyo Económico',
+                    'Hospedaje',
+                    'Transporte',
+                    'Uso de Instalaciones',
+                    'Equipo',
+                    'Otro'
                 ]
-            },
-            {
-                name: 'tipo_actividad',
-                label: 'Tipo de actividad',
-                type: 'select',
-                required: true,
-                options: [
-                    'Ponencia/Conferencia',
-                    'Curso/Taller',
-                    'Asesoría de investigación',
-                    'Colaboración en proyecto',
-                    'Visita académica',
-                    'Otra'
-                ]
-            },
-            {
-                name: 'titulo_actividad',
-                label: 'Título de la actividad',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'fecha_inicio',
-                label: 'Fecha de inicio',
-                type: 'date',
-                required: true
-            },
-            {
-                name: 'fecha_termino',
-                label: 'Fecha de término',
-                type: 'date',
-                required: true
-            },
-            {
-                name: 'descripcion',
-                label: 'Descripción de la actividad',
-                type: 'textarea',
-                required: true,
-                rows: 4
-            },
-            {
-                name: 'objetivo',
-                label: 'Objetivo y pertinencia',
-                type: 'textarea',
-                required: true,
-                rows: 4,
-                placeholder: 'Explique por qué es importante traer a esta persona'
-            },
-            {
-                name: 'tipos_apoyo',
-                label: 'Tipos de apoyo solicitado',
-                type: 'textarea',
-                required: true,
-                rows: 3,
-                placeholder: 'Ej: Transporte, hospedaje, honorarios, alimentación'
             },
             {
                 name: 'monto_total',
-                label: 'Monto total estimado (MXN)',
+                label: 'Monto Solicitado (si aplica)',
                 type: 'number',
-                required: true
+                required: false,
+                placeholder: '0.00'
             },
             {
-                name: 'desglose',
-                label: 'Desglose del presupuesto',
-                type: 'textarea',
+                name: 'periodo',
+                label: 'Periodo del Apoyo',
+                type: 'text',
                 required: true,
+                placeholder: 'Ej: Del 1 al 15 de marzo de 2026'
+            },
+            {
+                name: 'proposito',
+                label: 'Propósito del Apoyo',
+                type: 'textarea',
                 rows: 4,
-                placeholder: 'Detalle de cada concepto y monto'
+                required: true,
+                placeholder: 'Describa la actividad o proyecto que justifica el apoyo'
+            },
+            {
+                name: 'justificacion',
+                label: 'Justificación y Beneficios para el CITRO',
+                type: 'textarea',
+                rows: 5,
+                required: true,
+                placeholder: 'Explique por qué este apoyo es importante y cómo beneficia al CITRO'
             }
         ]
     },
     
+    // ━━━ COMITÉ TUTORIAL ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     comite_tutorial: {
-        title: 'Solicitud de Comité Tutorial',
-        subtitle: 'Maestría/Doctorado en Ecología Tropical',
+        title: 'Modificación de Comité Tutorial',
+        subtitle: 'Para estudiantes de posgrado (Maestría y Doctorado)',
         fields: [
             {
                 name: 'nombre_estudiante',
-                label: 'Nombre completo del estudiante',
+                label: 'Nombre del Estudiante',
                 type: 'text',
-                required: true
+                required: true,
+                placeholder: 'Nombre completo'
             },
             {
                 name: 'correo',
-                label: 'Correo electrónico',
+                label: 'Correo Electrónico',
                 type: 'email',
-                required: true
-            },
-            {
-                name: 'programa',
-                label: 'Programa de posgrado',
-                type: 'select',
                 required: true,
-                options: [
-                    'Maestría en Ecología Tropical',
-                    'Doctorado en Ecología Tropical'
-                ]
+                placeholder: 'correo@uv.mx'
             },
             {
                 name: 'matricula',
@@ -375,199 +336,164 @@ const FORMS_CONFIG = {
                 required: true
             },
             {
-                name: 'tema_tesis',
-                label: 'Tema/título de tesis',
-                type: 'textarea',
-                required: true,
-                rows: 3
-            },
-            {
-                name: 'director_nombre',
-                label: 'Nombre del Director de tesis',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'director_institucion',
-                label: 'Institución del Director',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'cotutor_nombre',
-                label: 'Nombre del Co-tutor (si aplica)',
-                type: 'text',
-                required: false
-            },
-            {
-                name: 'cotutor_institucion',
-                label: 'Institución del Co-tutor',
-                type: 'text',
-                required: false
-            },
-            {
-                name: 'asesor1_nombre',
-                label: 'Nombre del Asesor 1',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'asesor1_institucion',
-                label: 'Institución del Asesor 1',
-                type: 'text',
-                required: true
-            },
-            {
-                name: 'asesor2_nombre',
-                label: 'Nombre del Asesor 2 (si aplica)',
-                type: 'text',
-                required: false
-            },
-            {
-                name: 'asesor2_institucion',
-                label: 'Institución del Asesor 2',
-                type: 'text',
-                required: false
-            },
-            {
-                name: 'asesor3_nombre',
-                label: 'Nombre del Asesor 3 (si aplica)',
-                type: 'text',
-                required: false
-            },
-            {
-                name: 'asesor3_institucion',
-                label: 'Institución del Asesor 3',
-                type: 'text',
-                required: false
-            },
-            {
-                name: 'cambio_miembro',
-                label: '¿Se trata de cambio de algún miembro del comité?',
-                type: 'select',
-                required: true,
-                options: ['No', 'Sí']
-            },
-            {
-                name: 'motivo_cambio',
-                label: 'Si es cambio, especifique el motivo',
-                type: 'textarea',
-                required: false,
-                rows: 3
-            }
-        ]
-    },
-    
-    // ═══════════════════════════════════════════════════════════════
-    // NUEVO: SOLICITUD LIBRE
-    // ═══════════════════════════════════════════════════════════════
-    
-    solicitud_libre: {
-        title: 'Solicitud Libre al Consejo Técnico',
-        subtitle: 'Para trámites no contemplados en los formatos anteriores',
-        fields: [
-            {
-                name: 'nombre_completo',
-                label: 'Nombre completo del solicitante',
-                type: 'text',
-                required: true,
-                placeholder: 'Ej: Ana María García López'
-            },
-            {
-                name: 'correo',
-                label: 'Correo electrónico',
-                type: 'email',
-                required: true,
-                placeholder: 'ejemplo@uv.mx'
-            },
-            {
-                name: 'tipo_solicitante',
-                label: 'Tipo de solicitante',
+                name: 'programa',
+                label: 'Programa de Posgrado',
                 type: 'select',
                 required: true,
                 options: [
-                    'Estudiante de Maestría',
-                    'Estudiante de Doctorado',
-                    'Académico/Investigador',
-                    'Técnico Académico',
-                    'Personal Administrativo',
-                    'Egresado',
-                    'Externo',
+                    'Maestría en Ecología Tropical',
+                    'Doctorado en Ecología Tropical',
+                    'Maestría en Manejo de Ecosistemas',
                     'Otro'
                 ]
             },
             {
-                name: 'matricula',
-                label: 'Matrícula o número de personal (si aplica)',
+                name: 'semestre_actual',
+                label: 'Semestre Actual',
+                type: 'select',
+                required: true,
+                options: ['1', '2', '3', '4', '5', '6', '7', '8']
+            },
+            {
+                name: 'tipo_modificacion',
+                label: 'Tipo de Modificación Solicitada',
+                type: 'select',
+                required: true,
+                options: [
+                    'Cambio de Director de Tesis',
+                    'Cambio de Asesor',
+                    'Agregar Miembro al Comité',
+                    'Eliminar Miembro del Comité',
+                    'Reemplazo de Miembro'
+                ]
+            },
+            {
+                name: 'comite_actual',
+                label: 'Comité Tutorial Actual',
+                type: 'textarea',
+                rows: 3,
+                required: true,
+                placeholder: 'Lista de miembros actuales del comité (nombres y roles)'
+            },
+            {
+                name: 'comite_propuesto',
+                label: 'Comité Tutorial Propuesto',
+                type: 'textarea',
+                rows: 3,
+                required: true,
+                placeholder: 'Lista de miembros propuestos (nombres y roles)'
+            },
+            {
+                name: 'nombre_nuevo_miembro',
+                label: 'Nombre del Nuevo Miembro (si aplica)',
                 type: 'text',
                 required: false,
-                placeholder: 'Ej: S20012345'
+                placeholder: 'Dr./Dra. Nombre Completo'
+            },
+            {
+                name: 'institucion_nuevo_miembro',
+                label: 'Institución del Nuevo Miembro',
+                type: 'text',
+                required: false
+            },
+            {
+                name: 'justificacion',
+                label: 'Justificación de la Modificación',
+                type: 'textarea',
+                rows: 6,
+                required: true,
+                placeholder: 'Explique las razones académicas que justifican esta modificación'
+            }
+        ]
+    },
+    
+    // ━━━ SOLICITUD LIBRE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    solicitud_libre: {
+        title: 'Solicitud Libre',
+        subtitle: 'Para trámites no contemplados en los formatos anteriores',
+        fields: [
+            {
+                name: 'tipo_solicitante',
+                label: 'Tipo de Solicitante',
+                type: 'select',
+                required: true,
+                options: [
+                    'Estudiante de Licenciatura',
+                    'Estudiante de Maestría',
+                    'Estudiante de Doctorado',
+                    'Académico',
+                    'Técnico Académico',
+                    'Personal Administrativo',
+                    'Externo'
+                ]
+            },
+            {
+                name: 'nombre_completo',
+                label: 'Nombre Completo',
+                type: 'text',
+                required: true,
+                placeholder: 'Nombre completo del solicitante'
+            },
+            {
+                name: 'correo',
+                label: 'Correo Electrónico',
+                type: 'email',
+                required: true,
+                placeholder: 'correo@uv.mx'
+            },
+            {
+                name: 'matricula',
+                label: 'Matrícula / Número de Personal',
+                type: 'text',
+                required: false,
+                placeholder: 'Si aplica'
             },
             {
                 name: 'asunto',
-                label: 'Asunto de la solicitud',
+                label: 'Asunto de la Solicitud',
                 type: 'text',
                 required: true,
-                placeholder: 'Resuma en pocas palabras el motivo de su solicitud',
-                help: 'Sea específico y conciso (máximo 100 caracteres)'
+                placeholder: 'Resumen breve del asunto'
+            },
+            {
+                name: 'categoria',
+                label: 'Categoría',
+                type: 'select',
+                required: true,
+                options: [
+                    'Académico',
+                    'Administrativo',
+                    'Infraestructura',
+                    'Recursos',
+                    'Otro'
+                ]
             },
             {
                 name: 'descripcion',
-                label: 'Descripción detallada',
+                label: 'Descripción Detallada',
                 type: 'textarea',
-                required: true,
                 rows: 8,
-                placeholder: 'Explique con detalle su solicitud:\n\n- ¿Qué está solicitando?\n- ¿Por qué lo necesita?\n- ¿Cuándo lo necesita?\n- ¿Cómo beneficia al CITRO/UV?\n- Cualquier información relevante adicional',
-                help: 'Sea lo más específico posible para que el Consejo Técnico pueda evaluar adecuadamente su solicitud'
-            },
-            {
-                name: 'fecha_relacionada',
-                label: 'Fecha relacionada con la solicitud (si aplica)',
-                type: 'date',
-                required: false,
-                help: 'Fecha del evento, actividad, plazo, etc.'
-            },
-            {
-                name: 'requiere_presupuesto',
-                label: '¿La solicitud requiere apoyo económico?',
-                type: 'select',
                 required: true,
-                options: ['No', 'Sí']
-            },
-            {
-                name: 'monto_total',
-                label: 'Monto solicitado (MXN)',
-                type: 'number',
-                required: false,
-                placeholder: '0',
-                help: 'Solo si seleccionó "Sí" en la pregunta anterior'
-            },
-            {
-                name: 'desglose_presupuesto',
-                label: 'Desglose del presupuesto',
-                type: 'textarea',
-                required: false,
-                rows: 4,
-                placeholder: 'Si requiere apoyo económico, detalle los gastos:\n\nConcepto 1: $XXXX\nConcepto 2: $XXXX\n...',
-                help: 'Solo si seleccionó "Sí" en apoyo económico'
+                placeholder: 'Describa detalladamente su solicitud, incluyendo antecedentes, justificación y resultados esperados'
             },
             {
                 name: 'documentos_adjuntos',
-                label: 'Documentos de respaldo',
+                label: 'Documentos Adjuntos (opcional)',
                 type: 'textarea',
+                rows: 2,
                 required: false,
-                rows: 3,
-                placeholder: 'Liste los documentos que adjuntará por separado:\n- Cotización\n- Carta de invitación\n- Programa del evento\netc.',
-                help: 'Indique qué documentos proporcionará como evidencia o respaldo (adjuntarlos posteriormente por correo)'
-            },
-            {
-                name: 'observaciones',
-                label: 'Observaciones adicionales',
-                type: 'textarea',
-                required: false,
-                rows: 3,
-                placeholder: 'Cualquier información adicional que considere relevante'
+                placeholder: 'Liste los documentos que adjunta o mencione si los enviará posteriormente'
             }
         ]
     }
 };
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// LOG DE CARGA
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+if (typeof CONFIG !== 'undefined' && CONFIG.options?.debug) {
+    console.log('📦 forms-data.js cargado');
+    console.log('   Formularios disponibles:', Object.keys(FORMS_CONFIG).length);
+    console.log('   Tipos:', Object.keys(FORMS_CONFIG).join(', '));
+}
