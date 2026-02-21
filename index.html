@@ -3,427 +3,767 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CITRO - Sistema de Gestión Académica Digital</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Microsoft Authentication Library (MSAL) -->
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <title>CITRO - Sistema de Gestión Académica | Universidad Veracruzana</title>
+    
+    <!-- Fluent UI Icons -->
+    <link rel="stylesheet" href="https://static2.sharepointonline.com/files/fabric/office-ui-fabric-core/11.0.0/css/fabric.min.css">
+    
+    <style>
+        /* ═══════════════════════════════════════════════════════════════
+           CITRO - Estilos Principales
+           ═══════════════════════════════════════════════════════════════ */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #FAF9F8;
+            color: #323130;
+            line-height: 1.6;
+        }
+        
+        /* ━━━ HEADER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        header {
+            background: #fff;
+            border-bottom: 1px solid #EDEBE9;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo img {
+            height: 40px;
+        }
+        
+        .logo-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0078D4;
+            margin: 0;
+        }
+        
+        .logo-text p {
+            font-size: 12px;
+            color: #605E5C;
+            margin: 0;
+        }
+        
+        /* ━━━ LOGIN/USER MENU ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #login-container {
+            display: none;
+        }
+        
+        .btn-login {
+            background: #0078D4;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .btn-login:hover {
+            background: #106EBE;
+        }
+        
+        #user-menu {
+            display: none;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+        
+        .user-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #F3F2F1;
+            border: 1px solid #EDEBE9;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .user-button:hover {
+            background: #EDEBE9;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #0078D4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .user-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+        }
+        
+        .user-email {
+            font-size: 12px;
+            color: #605E5C;
+        }
+        
+        #user-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 8px;
+            background: white;
+            border: 1px solid #EDEBE9;
+            border-radius: 4px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+            min-width: 280px;
+            padding: 8px 0;
+        }
+        
+        #user-dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-header {
+            padding: 16px;
+            border-bottom: 1px solid #EDEBE9;
+        }
+        
+        .dropdown-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background: #F3F2F1;
+        }
+        
+        .dropdown-item.logout {
+            border-top: 1px solid #EDEBE9;
+            color: #D13438;
+        }
+        
+        /* ━━━ MAIN CONTAINER ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+        
+        /* ━━━ SECCIONES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .landing-page,
+        .form-section,
+        .mis-solicitudes-section,
+        .admin-panel-section,
+        .success-section {
+            display: none;
+        }
+        
+        .landing-page.active,
+        .form-section.active,
+        .mis-solicitudes-section.active,
+        .admin-panel-section.active,
+        .success-section.active {
+            display: block;
+        }
+        
+        /* ━━━ LANDING PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #login-required-banner {
+            display: none;
+            background: #FFF4CE;
+            border: 2px solid #FFB900;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 12px;
+        }
+        
+        .welcome-section p {
+            font-size: 18px;
+            color: #605E5C;
+        }
+        
+        .forms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+            margin-top: 32px;
+        }
+        
+        .form-card {
+            background: white;
+            border: 1px solid #EDEBE9;
+            border-radius: 8px;
+            padding: 32px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: #0078D4;
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+        
+        .form-card:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transform: translateY(-4px);
+        }
+        
+        .form-card:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .form-card-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+        
+        .form-card h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+        
+        .form-card p {
+            font-size: 14px;
+            color: #605E5C;
+            line-height: 1.5;
+        }
+        
+        /* ━━━ FORMULARIO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .form-header {
+            margin-bottom: 32px;
+        }
+        
+        .form-header h2 {
+            font-size: 28px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+        
+        .form-header p {
+            color: #605E5C;
+        }
+        
+        .form-container {
+            background: white;
+            border: 1px solid #EDEBE9;
+            border-radius: 8px;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+        
+        .form-label.required::after {
+            content: ' *';
+            color: #D13438;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #8A8886;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #0078D4;
+        }
+        
+        .form-help-text {
+            font-size: 12px;
+            color: #605E5C;
+            margin-top: 4px;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 32px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #0078D4;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #106EBE;
+        }
+        
+        .btn-secondary {
+            background: #F3F2F1;
+            color: #323130;
+            border: 1px solid #8A8886;
+        }
+        
+        .btn-secondary:hover {
+            background: #EDEBE9;
+        }
+        
+        /* ━━━ PANTALLA DE ÉXITO ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        .success-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 80px auto;
+        }
+        
+        .success-icon {
+            font-size: 80px;
+            color: #107C10;
+            margin-bottom: 24px;
+        }
+        
+        .success-container h2 {
+            font-size: 32px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 16px;
+        }
+        
+        .success-details {
+            background: #EBF3FB;
+            border-left: 4px solid #0078D4;
+            padding: 24px;
+            margin: 32px 0;
+            text-align: left;
+        }
+        
+        .success-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 32px;
+        }
+        
+        /* ━━━ LOADING OVERLAY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        #loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        #loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .spinner {
+            border: 4px solid #F3F2F1;
+            border-top: 4px solid #0078D4;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ━━━ RESPONSIVE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+            
+            .forms-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
 
-    <!-- ═══ HEADER ═══ -->
-    <header class="header">
-        <div class="container header-content">
-            <div class="logo-section">
-                <div class="logo-circle">
-                    <!-- Logo CITRO -->
-                    <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-                        <path d="M16 8L8 16L16 24L24 16L16 8Z" fill="#0078D4"/>
-                        <circle cx="16" cy="16" r="12" stroke="#0078D4" stroke-width="2" fill="none"/>
-                    </svg>
-                </div>
+    <!-- ═══════════════════════════════════════════════════════════════
+         HEADER
+         ═══════════════════════════════════════════════════════════════ -->
+    
+    <header>
+        <div class="header-container">
+            <div class="logo">
                 <div class="logo-text">
-                    <h1 class="system-title">SISTEMA CITRO</h1>
-                    <p class="system-subtitle">GESTIÓN INSTITUCIONAL UV</p>
+                    <h1>CITRO - Sistema de Gestión</h1>
+                    <p>Universidad Veracruzana</p>
                 </div>
             </div>
-            <nav class="nav-buttons">
-                <!-- Estado: No autenticado -->
-                <div id="login-container">
-                    <button class="btn-ms-login" onclick="signInWithMicrosoft()">
-                        <svg width="18" height="18" viewBox="0 0 21 21" fill="none">
-                            <rect x="0" y="0" width="10" height="10" fill="#F25022"/>
-                            <rect x="11" y="0" width="10" height="10" fill="#7FBA00"/>
-                            <rect x="0" y="11" width="10" height="10" fill="#00A4EF"/>
-                            <rect x="11" y="11" width="10" height="10" fill="#FFB900"/>
-                        </svg>
-                        Iniciar sesión con Microsoft
-                    </button>
-                </div>
-
-                <!-- Estado: Autenticado -->
-                <div id="user-menu" class="user-menu" style="display:none">
-                    <div class="user-avatar" onclick="toggleUserDropdown()">
-                        <div id="user-initials" class="user-initials">UV</div>
-                        <span id="user-name-short"></span>
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M2 4L6 8L10 4" stroke="currentColor" stroke-width="2"/>
-                        </svg>
+            
+            <!-- Login Button -->
+            <div id="login-container">
+                <button class="btn-login" onclick="signInWithMicrosoft()">
+                    🔐 Iniciar sesión con Microsoft
+                </button>
+            </div>
+            
+            <!-- User Menu -->
+            <div id="user-menu">
+                <button class="user-button" onclick="toggleUserDropdown()">
+                    <div class="user-avatar" id="user-initials">UV</div>
+                    <div class="user-info">
+                        <span class="user-name" id="user-name-short">Usuario</span>
                     </div>
-                    <div id="user-dropdown" class="user-dropdown">
-                        <div class="dropdown-header">
-                            <div id="user-avatar-large" class="user-initials-large">UV</div>
+                    <span>▼</span>
+                </button>
+                
+                <div id="user-dropdown">
+                    <div class="dropdown-header">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                            <div class="user-avatar" style="width: 48px; height: 48px; font-size: 18px;" id="user-avatar-large">UV</div>
                             <div>
-                                <div id="user-name-full" class="user-name-full"></div>
-                                <div id="user-email-dd" class="user-email"></div>
+                                <div style="font-weight: 600; color: #323130;" id="user-name-full">Usuario</div>
+                                <div style="font-size: 12px; color: #605E5C;" id="user-email-dd">email@uv.mx</div>
                             </div>
                         </div>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item" onclick="goToMisSolicitudes()">
-                            📋 Mis Solicitudes
-                        </button>
-                        <button class="dropdown-item" id="admin-panel-btn" onclick="goToAdminPanel()" style="display:none">
-                            👑 Panel de Administración
-                        </button>
-                        <div class="dropdown-divider"></div>
-                        <button class="dropdown-item logout" onclick="signOutMicrosoft()">
-                            🚪 Cerrar Sesión
-                        </button>
+                    </div>
+                    <div class="dropdown-item" onclick="goToMisSolicitudes()">
+                        📋 Mis Solicitudes
+                    </div>
+                    <div class="dropdown-item" id="admin-panel-btn" style="display: none;" onclick="goToAdminPanel()">
+                        👑 Panel de Administración
+                    </div>
+                    <div class="dropdown-item logout" onclick="signOutMicrosoft()">
+                        🚪 Cerrar sesión
                     </div>
                 </div>
-
-                <button class="btn-nav-secondary" onclick="goToHome()">Inicio</button>
-            </nav>
+            </div>
         </div>
     </header>
 
-    <!-- ═══ MAIN CONTENT ═══ -->
-    <main class="main-content">
-        <div class="container">
-
-            <!-- ─── LANDING PAGE ─── -->
-            <section id="landing-page" class="landing-page active">
-                <div class="hero-section">
-                    <div class="ms-badge">
-                        <svg width="14" height="14" viewBox="0 0 21 21" fill="none">
-                            <rect x="0" y="0" width="10" height="10" fill="#F25022"/>
-                            <rect x="11" y="0" width="10" height="10" fill="#7FBA00"/>
-                            <rect x="0" y="11" width="10" height="10" fill="#00A4EF"/>
-                            <rect x="11" y="11" width="10" height="10" fill="#FFB900"/>
-                        </svg>
-                        Integrado con Microsoft 365
-                    </div>
-                    <h2 class="hero-title">Gestión Académica Digital</h2>
-                    <p class="hero-description">
-                        Seleccione el tipo de trámite que desea realizar.
-                        El sistema generará automáticamente el formato oficial y lo almacenará en SharePoint.
-                    </p>
+    <!-- ═══════════════════════════════════════════════════════════════
+         MAIN CONTENT
+         ═══════════════════════════════════════════════════════════════ -->
+    
+    <main class="container">
+        
+        <!-- ━━━ LANDING PAGE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        
+        <div class="landing-page active" id="landing-page">
+            <!-- Banner de login requerido -->
+            <div id="login-required-banner">
+                <h3 style="margin-bottom: 12px;">⚠️ Inicio de sesión requerido</h3>
+                <p style="margin-bottom: 16px;">
+                    Para enviar solicitudes al H. Consejo Técnico del CITRO,<br>
+                    debes iniciar sesión con tu cuenta institucional <strong>@uv.mx</strong>
+                </p>
+                <button class="btn-primary btn" onclick="signInWithMicrosoft()">
+                    🔐 Iniciar sesión con Microsoft
+                </button>
+            </div>
+            
+            <!-- Welcome Section -->
+            <div class="welcome-section">
+                <h1>Gestión de Solicitudes al Consejo Técnico</h1>
+                <p>Centro de Investigaciones Tropicales (CITRO)</p>
+            </div>
+            
+            <!-- Forms Grid -->
+            <div class="forms-grid">
+                <div class="form-card" onclick="selectTramite('apoyo_academico')">
+                    <div class="form-card-icon">🎓</div>
+                    <h3>Apoyo Académico</h3>
+                    <p>Solicitud de apoyo para actividades académicas, congresos, viajes de investigación.</p>
                 </div>
-
-                <!-- Login requerido si no está autenticado -->
-                <div id="login-required-banner" class="login-banner" style="display:none">
-                    <div class="banner-content">
-                        <span>🔐 Inicia sesión con tu cuenta institucional para enviar solicitudes</span>
-                        <button class="btn-banner-login" onclick="signInWithMicrosoft()">
-                            Iniciar sesión →
-                        </button>
-                    </div>
+                
+                <div class="form-card" onclick="selectTramite('aval_institucional')">
+                    <div class="form-card-icon">✅</div>
+                    <h3>Aval Institucional</h3>
+                    <p>Respaldo oficial para representar al CITRO en eventos académicos.</p>
                 </div>
-
-                <div class="cards-grid">
-                    <div class="tramite-card" onclick="selectTramite('apoyo_academico')">
-                        <div class="card-icon green">
-                            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                                <path d="M12 20L24 8L36 20M24 12V38" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                                <rect x="8" y="32" width="32" height="8" rx="2" fill="currentColor" opacity="0.2"/>
-                            </svg>
-                        </div>
-                        <h3 class="card-title">Apoyo Académico</h3>
-                        <p class="card-description">Recursos económicos para actividades de investigación o eventos.</p>
-                        <div class="card-footer">
-                            <span class="card-badge">SharePoint</span>
-                            <span class="card-arrow">→</span>
-                        </div>
-                    </div>
-
-                    <div class="tramite-card" onclick="selectTramite('aval_institucional')">
-                        <div class="card-icon blue">
-                            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                                <circle cx="24" cy="24" r="16" stroke="currentColor" stroke-width="3"/>
-                                <path d="M18 24L22 28L30 20" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h3 class="card-title">Aval Institucional</h3>
-                        <p class="card-description">Respaldo oficial para representar al CITRO en eventos académicos.</p>
-                        <div class="card-footer">
-                            <span class="card-badge">SharePoint</span>
-                            <span class="card-arrow">→</span>
-                        </div>
-                    </div>
-
-                    <div class="tramite-card" onclick="selectTramite('apoyo_terceros')">
-                        <div class="card-icon purple">
-                            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                                <circle cx="18" cy="16" r="6" stroke="currentColor" stroke-width="2.5"/>
-                                <circle cx="30" cy="16" r="6" stroke="currentColor" stroke-width="2.5"/>
-                                <path d="M12 32C12 28 14 26 18 26C22 26 24 28 24 32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                                <path d="M24 32C24 28 26 26 30 26C34 26 36 28 36 32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h3 class="card-title">Apoyo a Terceros</h3>
-                        <p class="card-description">Apoyo para colaboradores externos o invitados especiales.</p>
-                        <div class="card-footer">
-                            <span class="card-badge">SharePoint</span>
-                            <span class="card-arrow">→</span>
-                        </div>
-                    </div>
-
-                    <div class="tramite-card" onclick="selectTramite('comite_tutorial')">
-                        <div class="card-icon teal">
-                            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                                <path d="M16 18H32M16 24H32M16 30H26" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                                <rect x="10" y="10" width="28" height="28" rx="3" stroke="currentColor" stroke-width="3"/>
-                            </svg>
-                        </div>
-                        <h3 class="card-title">Comité Tutorial</h3>
-                        <p class="card-description">Conformación o modificación de comité tutorial para posgrado.</p>
-                        <div class="card-footer">
-                            <span class="card-badge">SharePoint</span>
-                            <span class="card-arrow">→</span>
-                        </div>
-                    </div>
-
-                    <!-- 5TO FORMULARIO: SOLICITUD LIBRE -->
-                    <div class="tramite-card" onclick="selectTramite('solicitud_libre')">
-                        <div class="card-icon orange">
-                            <svg width="36" height="36" viewBox="0 0 48 48" fill="none">
-                                <rect x="10" y="10" width="28" height="28" rx="3" stroke="currentColor" stroke-width="3"/>
-                                <path d="M16 20H32M16 26H28M16 32H24" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-                                <path d="M30 10L38 18M30 10H36V16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <h3 class="card-title">Solicitud Libre</h3>
-                        <p class="card-description">Para trámites no contemplados en los formatos anteriores.</p>
-                        <div class="card-footer">
-                            <span class="card-badge">SharePoint</span>
-                            <span class="card-arrow">→</span>
-                        </div>
-                    </div>
+                
+                <div class="form-card" onclick="selectTramite('apoyo_terceros')">
+                    <div class="form-card-icon">👥</div>
+                    <h3>Apoyo a Terceros</h3>
+                    <p>Apoyo para colaboradores externos o instituciones especiales.</p>
                 </div>
-            </section>
-
-            <!-- ─── FORMULARIO ─── -->
-            <section id="form-section" class="form-section">
-                <button class="btn-back" onclick="backToLanding()">← Regresar</button>
-                <div class="form-container">
-                    <div class="form-header">
-                        <h2 id="form-title" class="form-title"></h2>
-                        <p id="form-subtitle" class="form-subtitle"></p>
-                    </div>
-                    <form id="dynamic-form" class="dynamic-form"></form>
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary-large" onclick="backToLanding()">Cancelar</button>
-                        <button type="button" class="btn-primary-large" onclick="submitForm()">
-                            Enviar Solicitud
-                        </button>
-                    </div>
+                
+                <div class="form-card" onclick="selectTramite('comite_tutorial')">
+                    <div class="form-card-icon">📚</div>
+                    <h3>Comité Tutorial</h3>
+                    <p>Modificación de comité tutorial para estudiantes de posgrado.</p>
                 </div>
-            </section>
-
-            <!-- ─── MIS SOLICITUDES ─── -->
-            <section id="mis-solicitudes-section" class="mis-solicitudes-section">
-                <div class="section-header">
-                    <h2 class="section-title">📋 Mis Solicitudes</h2>
-                    <button class="btn-nav-secondary" onclick="goToHome()">← Volver al Inicio</button>
+                
+                <div class="form-card" onclick="selectTramite('solicitud_libre')">
+                    <div class="form-card-icon">📝</div>
+                    <h3>Solicitud Libre</h3>
+                    <p>Para trámites no contemplados en los formatos anteriores.</p>
                 </div>
-                <div id="solicitudes-list" class="solicitudes-list"></div>
-            </section>
-
-            <!-- ─── PANEL ADMIN ─── -->
-            <section id="admin-panel-section" class="admin-panel-section">
-                <div class="section-header">
-                    <h2 class="section-title">👑 Panel de Administración — CITRO</h2>
-                    <button class="btn-nav-secondary" onclick="goToHome()">← Volver al Inicio</button>
-                </div>
-
-                <!-- Tarjetas de Estadísticas -->
-                <div class="stats-grid">
-                    <div class="stat-card green">
-                        <div class="stat-icon">💰</div>
-                        <div class="stat-content">
-                            <div class="stat-label">Total Autorizado</div>
-                            <div class="stat-value" id="total-autorizado">$0 MXN</div>
-                        </div>
-                    </div>
-                    <div class="stat-card blue">
-                        <div class="stat-icon">📋</div>
-                        <div class="stat-content">
-                            <div class="stat-label">Total Solicitudes</div>
-                            <div class="stat-value" id="total-solicitudes">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card orange">
-                        <div class="stat-icon">⏳</div>
-                        <div class="stat-content">
-                            <div class="stat-label">Pendientes</div>
-                            <div class="stat-value" id="total-pendientes">0</div>
-                        </div>
-                    </div>
-                    <div class="stat-card teal">
-                        <div class="stat-icon">✅</div>
-                        <div class="stat-content">
-                            <div class="stat-label">Aprobadas</div>
-                            <div class="stat-value" id="total-aprobadas">0</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Filtros -->
-                <div class="filters-bar">
-                    <input type="text" id="search-filter" class="filter-input" placeholder="🔍 Buscar por nombre, folio, email..." oninput="filterAdmin()">
-                    <select id="status-filter" class="filter-select" onchange="filterAdmin()">
-                        <option value="">Todos los estados</option>
-                        <option value="Pendiente">Pendiente</option>
-                        <option value="En Revisión">En Revisión</option>
-                        <option value="Aprobado">Aprobado</option>
-                        <option value="Rechazado">Rechazado</option>
-                    </select>
-                    <select id="type-filter" class="filter-select" onchange="filterAdmin()">
-                        <option value="">Todos los tipos</option>
-                        <option value="Apoyo Académico">Apoyo Académico</option>
-                        <option value="Aval Institucional">Aval Institucional</option>
-                        <option value="Apoyo a Terceros">Apoyo a Terceros</option>
-                        <option value="Comité Tutorial">Comité Tutorial</option>
-                        <option value="Solicitud Libre">Solicitud Libre</option>
-                    </select>
-                    <button class="btn-export" onclick="exportToExcel()">
-                        📊 Exportar a Excel
+            </div>
+        </div>
+        
+        <!-- ━━━ FORM SECTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        
+        <div class="form-section" id="form-section">
+            <div class="form-header">
+                <h2 id="form-title">Formulario</h2>
+                <p id="form-subtitle">Complete todos los campos requeridos</p>
+            </div>
+            
+            <div class="form-container">
+                <form id="dynamic-form">
+                    <!-- El formulario se genera dinámicamente aquí -->
+                </form>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="backToLanding()">
+                        ← Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="submitForm()">
+                        📤 Enviar Solicitud
                     </button>
                 </div>
-
-                <!-- Tabla -->
-                <div class="admin-table-container">
-                    <table class="admin-table" id="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Folio</th>
-                                <th>Fecha</th>
-                                <th>Tipo</th>
-                                <th>Solicitante</th>
-                                <th>Email</th>
-                                <th>$ Solicitado</th>
-                                <th>Estado</th>
-                                <th>$ Autorizado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-table-body">
-                            <tr id="loading-row">
-                                <td colspan="9" style="text-align:center;padding:40px">
-                                    <div class="spinner-small"></div>
-                                    Cargando desde SharePoint...
-                                </td>
-                            </tr>
-                        </tbody>
+            </div>
+        </div>
+        
+        <!-- ━━━ SUCCESS SECTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        
+        <div class="success-section" id="success-section">
+            <div class="success-container">
+                <div class="success-icon">✅</div>
+                <h2>¡Solicitud Enviada Exitosamente!</h2>
+                <p style="color: #605E5C; margin-bottom: 24px;">
+                    Tu solicitud ha sido registrada en el sistema y enviada al H. Consejo Técnico del CITRO.
+                </p>
+                
+                <div class="success-details">
+                    <h3 style="color: #0078D4; margin-bottom: 16px;">📋 Detalles de la Solicitud</h3>
+                    <table style="width: 100%; font-size: 14px;">
+                        <tr>
+                            <td style="padding: 8px 0; font-weight: 600;">Folio:</td>
+                            <td style="padding: 8px 0; color: #0078D4; font-family: monospace; font-weight: 700;" id="success-folio">—</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; font-weight: 600;">Fecha:</td>
+                            <td style="padding: 8px 0;" id="success-date">—</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; font-weight: 600;">Tipo de Trámite:</td>
+                            <td style="padding: 8px 0;" id="success-type">—</td>
+                        </tr>
                     </table>
                 </div>
-            </section>
-
-            <!-- ─── ÉXITO ─── -->
-            <section id="success-section" class="success-section">
-                <div class="success-container">
-                    <div class="success-icon">✅</div>
-                    <h2 class="success-title">¡Solicitud Enviada Exitosamente!</h2>
-                    <p class="success-description">
-                        Su solicitud fue guardada en <strong>SharePoint</strong> y enviada al H. Consejo Técnico del CITRO.
+                
+                <div class="success-actions">
+                    <button class="btn btn-primary" onclick="openSharePoint()">
+                        📄 Ver PDF en SharePoint
+                    </button>
+                    <button class="btn btn-secondary btn-calendar-outlook" onclick="addToOutlookCalendar()">
+                        📅 Agregar a Calendario
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToMisSolicitudes()">
+                        📋 Ver Mis Solicitudes
+                    </button>
+                    <button class="btn btn-secondary" onclick="goToHome()">
+                        🏠 Nueva Solicitud
+                    </button>
+                </div>
+                
+                <div style="margin-top: 32px; padding: 20px; background: #FAF9F8; border-radius: 8px; text-align: left;">
+                    <p style="font-size: 13px; color: #605E5C; line-height: 1.6;">
+                        <strong>📌 Próximos pasos:</strong><br>
+                        • Recibirás un email de confirmación con los detalles de tu solicitud<br>
+                        • El Consejo Técnico revisará tu solicitud en las próximas sesiones<br>
+                        • Puedes consultar el estado en "Mis Solicitudes" en cualquier momento<br>
+                        • Si se requiere información adicional, el CT se pondrá en contacto contigo
                     </p>
-                    <div class="success-details">
-                        <div class="detail-item">
-                            <span class="detail-label">Folio:</span>
-                            <span id="success-folio" class="detail-value">—</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Fecha:</span>
-                            <span id="success-date" class="detail-value">—</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">Tipo:</span>
-                            <span id="success-type" class="detail-value">—</span>
-                        </div>
-                    </div>
-                    <div class="success-actions">
-                        <button class="btn-calendar-outlook" onclick="addToOutlookCalendar()">
-                            📅 Agregar a Outlook
-                        </button>
-                        <button class="btn-sharepoint" onclick="openSharePoint()">
-                            🗂️ Ver en SharePoint
-                        </button>
-                    </div>
-                    <button class="btn-primary-large" onclick="goToHome()">Realizar Otra Solicitud</button>
-                </div>
-            </section>
-
-            <!-- Loading overlay -->
-            <div id="loading-overlay" class="loading-overlay">
-                <div class="loading-spinner">
-                    <div class="spinner"></div>
-                    <p class="loading-text">Procesando solicitud en SharePoint...</p>
                 </div>
             </div>
-
-            <!-- Modal Edición Admin -->
-            <div id="edit-modal" class="modal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Editar Solicitud</h3>
-                        <button class="modal-close" onclick="closeEditModal()">✕</button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit-sharepoint-id">
-                        <div class="form-group">
-                            <label class="form-label">Estado</label>
-                            <select id="edit-status" class="form-select">
-                                <option value="Pendiente">⏳ Pendiente</option>
-                                <option value="En Revisión">🔍 En Revisión</option>
-                                <option value="Aprobado">✅ Aprobado</option>
-                                <option value="Rechazado">❌ Rechazado</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Monto Autorizado (MXN)</label>
-                            <input type="number" id="edit-monto" class="form-input" placeholder="0.00">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Notas del Consejo Técnico</label>
-                            <textarea id="edit-notas" class="form-textarea" rows="4" placeholder="Observaciones, condiciones o motivos de la decisión..."></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Notificar al solicitante por email</label>
-                            <select id="edit-notify" class="form-select">
-                                <option value="si">✉️ Sí, enviar notificación</option>
-                                <option value="no">No enviar</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn-secondary-large" onclick="closeEditModal()">Cancelar</button>
-                        <button class="btn-primary-large" onclick="saveEdit()">Guardar en SharePoint</button>
-                    </div>
-                </div>
-            </div>
-
         </div>
+        
+        <!-- ━━━ MIS SOLICITUDES SECTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        
+        <div class="mis-solicitudes-section" id="mis-solicitudes-section">
+            <div class="form-header">
+                <h2>📋 Mis Solicitudes</h2>
+                <p>Historial de solicitudes enviadas al Consejo Técnico</p>
+            </div>
+            
+            <div id="mis-solicitudes-content">
+                <!-- El contenido se carga dinámicamente -->
+                <p style="text-align: center; color: #605E5C; padding: 40px;">
+                    Cargando solicitudes...
+                </p>
+            </div>
+            
+            <div class="form-actions">
+                <button class="btn btn-secondary" onclick="goToHome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </div>
+        
+        <!-- ━━━ ADMIN PANEL SECTION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ -->
+        
+        <div class="admin-panel-section" id="admin-panel-section">
+            <div class="form-header">
+                <h2>👑 Panel de Administración</h2>
+                <p>Gestión de solicitudes del Consejo Técnico</p>
+            </div>
+            
+            <div id="admin-panel-content">
+                <!-- El contenido se carga dinámicamente -->
+                <p style="text-align: center; color: #605E5C; padding: 40px;">
+                    Cargando panel de administración...
+                </p>
+            </div>
+        </div>
+        
     </main>
 
-    <!-- ═══ FOOTER ═══ -->
-    <footer class="footer">
-        <div class="container footer-content">
-            <div class="footer-info">
-                <p class="footer-title">Centro de Investigaciones Tropicales (CITRO)</p>
-                <p class="footer-text">Universidad Veracruzana • Microsoft 365</p>
-            </div>
-            <div class="footer-links">
-                <span class="footer-ms">
-                    <svg width="14" height="14" viewBox="0 0 21 21" fill="none">
-                        <rect x="0" y="0" width="10" height="10" fill="#F25022"/>
-                        <rect x="11" y="0" width="10" height="10" fill="#7FBA00"/>
-                        <rect x="0" y="11" width="10" height="10" fill="#00A4EF"/>
-                        <rect x="11" y="11" width="10" height="10" fill="#FFB900"/>
-                    </svg>
-                    Powered by Microsoft 365
-                </span>
-            </div>
+    <!-- ═══════════════════════════════════════════════════════════════
+         LOADING OVERLAY
+         ═══════════════════════════════════════════════════════════════ -->
+    
+    <div id="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p style="color: #323130; font-weight: 600;">Procesando...</p>
+            <p style="color: #605E5C; font-size: 14px;">Por favor espere</p>
         </div>
-    </footer>
+    </div>
 
-    <!-- Scripts -->
+    <!-- ═══════════════════════════════════════════════════════════════
+         SCRIPTS - ORDEN CRÍTICO
+         ═══════════════════════════════════════════════════════════════ -->
+    
+    <!-- 1️⃣ LIBRERÍAS EXTERNAS PRIMERO -->
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="config-m365.js"></script>
-    <script src="forms-data.js"></script>
-    <script src="auth-msal.js"></script>
-    <script src="sharepoint.js"></script>
-    <script src="admin-m365.js"></script>
-    <script src="calendar-outlook.js"></script>
-    <script src="app-m365.js"></script>
+    
+    <!-- 2️⃣ SISTEMA CITRO - ORDEN IMPORTANTE -->
+    <script src="config-m365.js"></script>          <!-- ← 1. Configuración PRIMERO -->
+    <script src="forms-data.js"></script>           <!-- ← 2. Datos de formularios -->
+    <script src="auth-msal.js"></script>            <!-- ← 3. Autenticación -->
+    <script src="sharepoint.js"></script>           <!-- ← 4. SharePoint API -->
+    <script src="app-m365.js"></script>             <!-- ← 5. Lógica principal -->
+    <script src="admin-m365.js"></script>           <!-- ← 6. Panel admin -->
+    <script src="calendar-outlook.js"></script>     <!-- ← 7. Calendar -->
+
 </body>
 </html>
