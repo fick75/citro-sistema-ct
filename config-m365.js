@@ -9,19 +9,17 @@
 const CONFIG = {
     
     // ━━━ AZURE ACTIVE DIRECTORY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    azure: {
-        clientId: '0681dda0-70f4-4038-b901-d41ee738cc2e',
-        tenantId: '3c907651-d8c6-4ca6-a8a4-6a242430e653',
-        
-        scopes: [
-            'User.Read',
-            'Sites.ReadWrite.All',    // ← SharePoint Lists
-            'Files.ReadWrite',        // ← OneDrive (NUEVO)
-            'Calendars.ReadWrite',
-            'Mail.Send'
-        ]
-    },
-
+azure: {
+    clientId: 'f76802b6-9751-45d5-8978-fe8ad2ad3927',
+    tenantId: '3c907651-d8c6-4ca6-a8a4-6a242430e653',
+    scopes: [
+        'User.Read',
+        'Sites.ReadWrite.All',
+        'Files.ReadWrite',
+        'Calendars.ReadWrite',
+        'Mail.Send'
+    ]
+}
     // ━━━ SHAREPOINT (SOLO LISTAS) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     sharepoint: {
         siteUrl: 'https://uvmx.sharepoint.com/sites/CtTramites2026',
